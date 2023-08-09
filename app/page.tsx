@@ -57,7 +57,7 @@ export default async function Home() {
         <h2 className="text-2xl">Top Tracks</h2>
         Showing {topTracks.limit} of {topTracks.total} tracks
       </div>
-      <table className="w-full">
+      <table className="w-full border-separate border-spacing-x-2 border-spacing-y-1">
         <thead>
           <tr>
             <th className="text-left">Rank</th>
