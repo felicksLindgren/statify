@@ -61,7 +61,6 @@ export default async function Home() {
         <thead>
           <tr>
             <th className="text-left">Rank</th>
-            <th className="text-left">Popularity</th>
             <th className="text-left">Album</th>
             <th className="text-left">Track</th>
           </tr>
@@ -70,7 +69,6 @@ export default async function Home() {
           {topTracks.items.map((track: Track, index: number) => (
             <tr key={track.id}>
               <td className="text-left">{index + 1}</td>
-              <td className="text-left">{track.popularity} %</td>
               <td className="text-left">
                 <Avatar rounded="rounded-md" alt={track.name[0]} src={track.album.images.length > 0 ? track.album.images[0].url : ''} />
               </td>
