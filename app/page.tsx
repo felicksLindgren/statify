@@ -64,7 +64,6 @@ export default async function Home() {
             <th className="text-left">Popularity</th>
             <th className="text-left">Album</th>
             <th className="text-left">Track</th>
-            <th className="text-left">Artist</th>
           </tr>
         </thead>
         <tbody>
@@ -77,9 +76,6 @@ export default async function Home() {
               </td>
               <td className="text-left">
                 <Link className="text-xl" target="_blank" href={track.external_urls.spotify}>{track.name}</Link>
-              </td>
-              <td className="text-left">
-                <Link className="text-xl" target="_blank" href={track.artists[0].external_urls.spotify}>{track.artists[0].name}</Link>
               </td>
             </tr>
           ))}
