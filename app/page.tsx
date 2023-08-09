@@ -1,6 +1,7 @@
 import { Avatar } from '@/components/ui/avatar';
 import { getToken } from '@/lib/utils'
 import { Pagination, SpotiyUser, Track } from '@/types';
+import { getServerSession } from 'next-auth';
 import Link from 'next/link';
 
 const getUser = async (): Promise<SpotiyUser> => {
@@ -21,7 +22,8 @@ const getUser = async (): Promise<SpotiyUser> => {
 
 const getTopTracks = async (type: 'artists' | 'tracks'): Promise<Pagination<Track>> => {
   const token = await getToken();
-  const res = await fetch(`${process.env.SPOTIFY_API_URL}/me/top/${type}?limit=50`, {
+
+  const res = await fetch(`${process.env.SPOTIFY_API_URL}/me/top/${type}?limit=50&time_range=long_term`, {
     headers: {
       Authorization: `Bearer ${token?.access_token}`
     }
@@ -31,11 +33,17 @@ const getTopTracks = async (type: 'artists' | 'tracks'): Promise<Pagination<Trac
     throw new Error(res.statusText);
   }
 
-  const data = await res.json();
+  const data = await res.json() as Pagination<Track>;
   return data;
 }
 
 export default async function Home() {
+  const session = await getServerSession();
+
+  if (session?.error) {
+    return <div>{session.error}</div>
+  }
+
   const user = await getUser();
   const topTracks = await getTopTracks('tracks');
 
@@ -49,15 +57,34 @@ export default async function Home() {
         <h2 className="text-2xl">Top Tracks</h2>
         Showing {topTracks.limit} of {topTracks.total} tracks
       </div>
-      <div className="flex flex-col gap-4">
-      {topTracks.items.map((track: Track, index: number) => (
-        <div key={track.id} className="flex flex-row items-center gap-3">
-          <span className="text-xl">{index + 1}</span>
-          <Avatar rounded="rounded-md" alt={track.name[0]} src={track.album.images.length > 0 ? track.album.images[0].url : ''} />
-          <Link className="text-xl" target="_blank" href={track.external_urls.spotify}>{track.name}</Link>
-        </div>
-      ))}
-      </div>
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th className="text-left">Rank</th>
+            <th className="text-left">Popularity</th>
+            <th className="text-left">Album</th>
+            <th className="text-left">Track</th>
+            <th className="text-left">Artist</th>
+          </tr>
+        </thead>
+        <tbody>
+          {topTracks.items.map((track: Track, index: number) => (
+            <tr key={track.id}>
+              <td className="text-left">{index + 1}</td>
+              <td className="text-left">{track.popularity} %</td>
+              <td className="text-left">
+                <Avatar rounded="rounded-md" alt={track.name[0]} src={track.album.images.length > 0 ? track.album.images[0].url : ''} />
+              </td>
+              <td className="text-left">
+                <Link className="text-xl" target="_blank" href={track.external_urls.spotify}>{track.name}</Link>
+              </td>
+              <td className="text-left">
+                <Link className="text-xl" target="_blank" href={track.artists[0].external_urls.spotify}>{track.artists[0].name}</Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </main>
   )
 }
