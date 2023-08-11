@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
+      <body className={`${roboto.className} overflow-y-scroll`}>
         <NextAuthProvider>{children}</NextAuthProvider>
       </body>
     </html>

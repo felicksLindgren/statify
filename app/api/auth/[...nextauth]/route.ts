@@ -20,6 +20,8 @@ const handler = NextAuth({
                 token.expires_at = account.expires_at;
             }
 
+            console.log(token);
+
             if (token?.expires_at) {
                 if (Date.now() > (token.expires_at * 1000)) {
                     token.error = 'RefreshAccessTokenError';
