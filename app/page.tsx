@@ -1,8 +1,17 @@
+import { LimitSelector } from '@/components/limit-selector';
+import { TimeRangeSelector } from '@/components/timerange-selector';
 import { Avatar } from '@/components/ui/avatar';
 import { getToken } from '@/lib/utils'
 import { Pagination, SpotiyUser, Track } from '@/types';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
+
+type HomeProps = {
+  searchParams: {
+    time_range: 'short_term' | 'medium_term' | 'long_term';
+    limit: 10 | 20 | 50;
+  }
+}
 
 const getUser = async (): Promise<SpotiyUser> => {
   const token = await getToken();
@@ -20,10 +29,14 @@ const getUser = async (): Promise<SpotiyUser> => {
   return user;
 }
 
-const getTopTracks = async (type: 'artists' | 'tracks'): Promise<Pagination<Track>> => {
+const getTopTracks = async (
+  type: 'artists' | 'tracks',
+  time_range: 'short_term' | 'medium_term' | 'long_term' = 'short_term',
+  limit: 10 | 20 | 50 = 10
+): Promise<Pagination<Track>> => {
   const token = await getToken();
 
-  const res = await fetch(`${process.env.SPOTIFY_API_URL}/me/top/${type}?limit=50&time_range=long_term`, {
+  const res = await fetch(`${process.env.SPOTIFY_API_URL}/me/top/${type}?limit=${limit}&time_range=${time_range}`, {
     headers: {
       Authorization: `Bearer ${token?.access_token}`
     }
@@ -37,7 +50,7 @@ const getTopTracks = async (type: 'artists' | 'tracks'): Promise<Pagination<Trac
   return data;
 }
 
-export default async function Home() {
+export default async function Home({ searchParams }: HomeProps) {
   const session = await getServerSession();
 
   if (session?.error) {
@@ -45,7 +58,7 @@ export default async function Home() {
   }
 
   const user = await getUser();
-  const topTracks = await getTopTracks('tracks');
+  const topTracks = await getTopTracks('tracks', searchParams?.time_range, searchParams?.limit);
 
   return (
     <main className="flex p-8 flex-col gap-4">
@@ -56,6 +69,10 @@ export default async function Home() {
       <div>
         <h2 className="text-2xl">Top Tracks</h2>
         Showing {topTracks.limit} of {topTracks.total} tracks
+      </div>
+      <div className="flex justify-between">
+        <LimitSelector />
+        <TimeRangeSelector />
       </div>
       <table className="w-full border-separate border-spacing-x-2 border-spacing-y-1">
         <thead>

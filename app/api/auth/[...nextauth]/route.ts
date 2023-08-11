@@ -21,7 +21,7 @@ const handler = NextAuth({
             }
 
             if (token?.expires_at) {
-                if (Date.now() > token.expires_at * 1000) {
+                if (Date.now() > (token.expires_at * 1000)) {
                     token.error = 'RefreshAccessTokenError';
                     return token;
                 }
@@ -29,7 +29,7 @@ const handler = NextAuth({
 
             return token;
         },
-        async session({ session, token}) {
+        async session({ session, token }) {
             session.error = token.error;
             return session;
         }
