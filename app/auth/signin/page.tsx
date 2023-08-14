@@ -6,12 +6,16 @@ import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function SignIn() {
     const { push } = useRouter()
-    const { status } = useSession();
+    const { status, data } = useSession();
     const searchParams = useSearchParams();
 
     const callbackUrl = searchParams.get('callbackUrl');
 
     useEffect(() => {
+        if (data?.error === 'RefreshAccessTokenError') {
+            void signIn('spotify');
+        }
+
         switch (status) {
             case 'authenticated':
                 push(callbackUrl ?? '/');

@@ -10,9 +10,5 @@ export const getToken = async () => {
         } as any
     });
 
-    if (token?.error === 'RefreshAccessTokenError') {
-        void signIn('spotify');
-    }
-
     return token;
 }
